@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+
 
 /**
  * The MenuScreen class is responsible for displaying the main menu of the game.
@@ -38,17 +40,55 @@ public class MenuScreen implements Screen {
         stage.addActor(table); // Add the table to the stage
 
         // Add a label as a title
-        table.add(new Label("Hello World from the Menu!", game.getSkin(), "title")).padBottom(80).row();
+        table.add(new Label("Yllezat Maze!", game.getSkin(), "title")).padBottom(80).row();
 
         // Create and add a button to go to the game screen
-        TextButton goToGameButton = new TextButton("Go To Game", game.getSkin());
-        table.add(goToGameButton).width(300).row();
+        TextButton goToGameButton = new TextButton("Start Playing", game.getSkin());
+        table.add(goToGameButton).width(300).padBottom(20).row();
         goToGameButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.goToGame(); // Change to the game screen when button is pressed
+                game.goToLevelSelection(); // Change to the game screen when button is pressed
             }
         });
+
+        TextButton howToPlayButton = new TextButton("How to Play", game.getSkin());
+        table.add(howToPlayButton).width(300).padBottom(20).row();
+        howToPlayButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Dialog dialog = new Dialog("", game.getSkin());
+                dialog.text("CONTROLS:\n\n" +
+                        "W/UP - Move Up\n" +
+                        "S/DOWN - Move Down\n" +
+                        "A/LEFT - Move Left\n" +
+                        "D/RIGHT - Move Right\n" +
+                        "SHIFT - Sprint \n" +
+                        "ESC - Return to Menu\n\n" +
+                        "OBJECTIVE:\n" +
+                        "Navigate the maze and reach the exit!");
+                dialog.button("OK");
+                dialog.show(stage);
+            }
+        });
+
+        TextButton storylineButton = new TextButton("Storyline", game.getSkin());
+        table.add(storylineButton).width(300).row();
+        storylineButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Dialog dialog = new Dialog("", game.getSkin());
+                dialog.text("Deep within an ancient fortress,\n" +
+                        "a brave soldier named Ylli\n" +
+                        "finds himself trapped in a mysterious maze.\n\n" +
+                        "With courage and determination,\n" +
+                        "you must find the exit to freedom!");
+                dialog.button("OK");
+                dialog.getContentTable().pad(20);
+                dialog.show(stage);
+            }
+        });
+
     }
 
     @Override

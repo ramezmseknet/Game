@@ -29,6 +29,8 @@ public class MazeRunnerGame extends Game {
     // Character animation downwards
     private Animation<TextureRegion> characterDownAnimation;
 
+    private TextureRegion wallTile;
+
     /**
      * Constructor for MazeRunnerGame.
      *
@@ -46,6 +48,7 @@ public class MazeRunnerGame extends Game {
         spriteBatch = new SpriteBatch(); // Create SpriteBatch
         skin = new Skin(Gdx.files.internal("craft/craftacular-ui.json")); // Load UI skin
         this.loadCharacterAnimation(); // Load character animation
+        this.loadWallTile();
 
         // Play some background music
         // Background sound
@@ -66,16 +69,35 @@ public class MazeRunnerGame extends Game {
             gameScreen = null;
         }
     }
+    public void goToLevelSelection() {
+        this.setScreen(new LevelSelectionScreen(this));
+        if (menuScreen != null) {
+            menuScreen.dispose();
+            menuScreen = null;
+        }
+        if (gameScreen != null) {
+            gameScreen.dispose();
+            gameScreen = null;
+        }
+    }
 
     /**
      * Switches to the game screen.
      */
-    public void goToGame() {
-        this.setScreen(new GameScreen(this)); // Set the current screen to GameScreen
+    public void goToGame(String levelFile) {
+        this.setScreen(new GameScreen(this, levelFile)); // Set the current screen to GameScreen
         if (menuScreen != null) {
             menuScreen.dispose(); // Dispose the menu screen if it exists
             menuScreen = null;
         }
+    }
+
+
+    /**
+     * Switches to the game screen with default level.
+     */
+    public void goToGame() {
+        goToGame("maps/level-1.properties"); // Default to level 1
     }
 
     /**
@@ -99,6 +121,22 @@ public class MazeRunnerGame extends Game {
         characterDownAnimation = new Animation<>(0.1f, walkFrames);
     }
 
+
+    private void loadWallTile() {
+        Texture basicTilesTexture = new Texture(Gdx.files.internal("basictiles.png"));
+
+        int tileSize = 16;
+        int tileIndex = 5;
+
+         wallTile = new TextureRegion(
+                basicTilesTexture,
+                tileIndex * tileSize,
+                0,
+                tileSize,
+                tileSize
+        );
+    }
+
     /**
      * Cleans up resources when the game is disposed.
      */
@@ -117,6 +155,10 @@ public class MazeRunnerGame extends Game {
 
     public Animation<TextureRegion> getCharacterDownAnimation() {
         return characterDownAnimation;
+    }
+
+    public TextureRegion getWallTile() {
+        return wallTile;
     }
 
     public SpriteBatch getSpriteBatch() {
