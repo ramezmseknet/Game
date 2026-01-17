@@ -1,130 +1,130 @@
 package de.tum.cit.fop.maze;
 
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-
+import de.tum.cit.fop.maze.screen.AbstractScreen;
+import de.tum.cit.fop.maze.ui.AnimatedBackground;
+import de.tum.cit.fop.maze.ui.UIUtils;
+import de.tum.cit.fop.maze.ui.UISoundHelper;
 
 /**
  * The MenuScreen class is responsible for displaying the main menu of the game.
- * It extends the LibGDX Screen class and sets up the UI components for the menu.
+ * Extends AbstractScreen for common screen functionality.
  */
-public class MenuScreen implements Screen {
+public class MenuScreen extends AbstractScreen {
 
-    private final Stage stage;
+    private final AnimatedBackground background;
 
     /**
-     * Constructor for MenuScreen. Sets up the camera, viewport, stage, and UI elements.
+     * Constructor for MenuScreen. Sets up the UI elements.
      *
      * @param game The main game class, used to access global resources and methods.
      */
     public MenuScreen(MazeRunnerGame game) {
-        var camera = new OrthographicCamera();
-        camera.zoom = 1.5f; // Set camera zoom for a closer view
+        super(game, AbstractScreen.DEFAULT_ZOOM);
+        // Animated background from sprite sheet (10 cols x 6 rows, 60 frames at 4fps = 0.25s per frame)
+        background = new AnimatedBackground("backgrounds/menu_bg_sheet.png", 10, 6, 0.25f);
 
-        Viewport viewport = new ScreenViewport(camera); // Create a viewport with the camera
-        stage = new Stage(viewport, game.getSpriteBatch()); // Create a stage for UI elements
-
-        Table table = new Table(); // Create a table for layout
-        table.setFillParent(true); // Make the table fill the stage
-        stage.addActor(table); // Add the table to the stage
+        Table table = new Table();
+        table.setFillParent(true);
+        stage.addActor(table);
 
         // Add a label as a title
         table.add(new Label("Yllezat Maze!", game.getSkin(), "title")).padBottom(80).row();
 
         // Create and add a button to go to the game screen
         TextButton goToGameButton = new TextButton("Start Playing", game.getSkin());
+        UIUtils.fitTextToButton(goToGameButton, 300);
         table.add(goToGameButton).width(300).padBottom(20).row();
+        UISoundHelper.addClickSound(goToGameButton);
         goToGameButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.goToLevelSelection(); // Change to the game screen when button is pressed
+                game.goToLevelSelection();
+            }
+        });
+
+        // Saved Games button
+        TextButton savedGamesButton = new TextButton("Saved Games", game.getSkin());
+        UIUtils.fitTextToButton(savedGamesButton, 300);
+        table.add(savedGamesButton).width(300).padBottom(20).row();
+        UISoundHelper.addClickSound(savedGamesButton);
+        savedGamesButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setScreen(new SavedGamesScreen(game));
             }
         });
 
         TextButton howToPlayButton = new TextButton("How to Play", game.getSkin());
+        UIUtils.fitTextToButton(howToPlayButton, 300);
         table.add(howToPlayButton).width(300).padBottom(20).row();
+        UISoundHelper.addClickSound(howToPlayButton);
         howToPlayButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                Dialog dialog = new Dialog("", game.getSkin());
-                dialog.text("CONTROLS:\n\n" +
-                        "W/UP - Move Up\n" +
-                        "S/DOWN - Move Down\n" +
-                        "A/LEFT - Move Left\n" +
-                        "D/RIGHT - Move Right\n" +
-                        "SHIFT - Sprint \n" +
-                        "ESC - Return to Menu\n\n" +
-                        "OBJECTIVE:\n" +
-                        "Navigate the maze and reach the exit!");
-                dialog.button("OK");
-                dialog.show(stage);
+                game.setScreen(new HowToPlayScreen(game));
             }
         });
 
         TextButton storylineButton = new TextButton("Storyline", game.getSkin());
-        table.add(storylineButton).width(300).row();
+        UIUtils.fitTextToButton(storylineButton, 300);
+        table.add(storylineButton).width(300).padBottom(20).row();
+        UISoundHelper.addClickSound(storylineButton);
         storylineButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                Dialog dialog = new Dialog("", game.getSkin());
-                dialog.text("Deep within an ancient fortress,\n" +
-                        "a brave soldier named Ylli\n" +
-                        "finds himself trapped in a mysterious maze.\n\n" +
-                        "With courage and determination,\n" +
-                        "you must find the exit to freedom!");
-                dialog.button("OK");
-                dialog.getContentTable().pad(20);
-                dialog.show(stage);
+                game.setScreen(new StorylineScreen(game));
             }
         });
 
+        // Leaderboard button
+        TextButton leaderboardButton = new TextButton("Leaderboard", game.getSkin());
+        UIUtils.fitTextToButton(leaderboardButton, 300);
+        table.add(leaderboardButton).width(300).padBottom(20).row();
+        UISoundHelper.addClickSound(leaderboardButton);
+        leaderboardButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setScreen(new LeaderboardScreen(game));
+            }
+        });
+
+        // Settings button
+        TextButton settingsButton = new TextButton("Settings", game.getSkin());
+        UIUtils.fitTextToButton(settingsButton, 300);
+        table.add(settingsButton).width(300).row();
+        UISoundHelper.addClickSound(settingsButton);
+
+        // Install keyboard navigation for menu buttons
+        com.badlogic.gdx.utils.Array<com.badlogic.gdx.scenes.scene2d.ui.TextButton> navButtons = new com.badlogic.gdx.utils.Array<>();
+        navButtons.add(goToGameButton, savedGamesButton, howToPlayButton, storylineButton);
+        navButtons.add(leaderboardButton, settingsButton);
+        de.tum.cit.fop.maze.ui.UIInputHelper.installVerticalNavigation(stage, navButtons);
+        settingsButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setScreen(new SettingsScreen(game, MenuScreen.this));
+            }
+        });
     }
 
     @Override
-    public void render(float delta) {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT); // Clear the screen
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f)); // Update the stage
-        stage.draw(); // Draw the stage
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true); // Update the stage viewport on resize
+    protected void draw(float delta) {
+        ScreenUtils.clear(0, 0, 0, 1);
+        background.update(delta);
+        background.render(game.getSpriteBatch());
+        stage.draw();
     }
 
     @Override
     public void dispose() {
-        // Dispose of the stage when screen is disposed
-        stage.dispose();
-    }
-
-    @Override
-    public void show() {
-        // Set the input processor so the stage can receive input events
-        Gdx.input.setInputProcessor(stage);
-    }
-
-    // The following methods are part of the Screen interface but are not used in this screen.
-    @Override
-    public void pause() {
-    }
-
-    @Override
-    public void resume() {
-    }
-
-    @Override
-    public void hide() {
+        background.dispose();
+        super.dispose();
     }
 }

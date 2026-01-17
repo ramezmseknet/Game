@@ -27,7 +27,7 @@ public class GameScreen implements Screen {
     private static final int PLAYER_HEIGHT= 64;
     private float moveCooldown = 0f;
     private static final float MOVE_DELAY = 0.15f;
-    private float stateTime; // Used for animation frame time
+    private float stateTime;
 
 
     private int[][] mazeLayout;
@@ -54,6 +54,7 @@ public class GameScreen implements Screen {
 
         // Get the font from the game's skin
         font = game.getSkin().getFont("font");
+
         stateTime = 0f;
 
         loadMazeFromFile(levelFile);
@@ -271,6 +272,8 @@ public class GameScreen implements Screen {
             mazeLayout = new int[15][15];
         }
     }
+
+
 
     private void setupCamera() {
         float screenWidth = Gdx.graphics.getWidth();
