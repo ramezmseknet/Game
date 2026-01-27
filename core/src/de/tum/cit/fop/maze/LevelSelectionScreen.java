@@ -20,7 +20,7 @@ import de.tum.cit.fop.maze.ui.UISoundHelper;
  * The LevelSelectionScreen allows players to choose between different levels.
  */
 @SuppressWarnings("unused")
-public class LevelSelectionScreen implements Screen {
+public class  LevelSelectionScreen implements Screen {
 
     private final MazeRunnerGame game;
     private final Stage stage;

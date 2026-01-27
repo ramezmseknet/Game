@@ -170,7 +170,7 @@ public class LeaderboardScreen implements Screen {
         scoresTable.clear();
 
         if (leaderboardData.entries.size == 0) {
-            scoresTable.add(new Label("No scores yet! Play a game to get on the board.", skin))
+            scoresTable.add(new Label("No scores yet! Play a game to get on the board.", skin) )
                     .pad(20);
             return;
         }
@@ -234,8 +234,8 @@ public class LeaderboardScreen implements Screen {
 
 
     private String formatTime(float seconds) {
-        int mins = (int) (seconds / 60);
-        int secs = (int) (seconds % 60);
+        int mins = (int) (seconds / 60 );
+        int secs = (int) (seconds % 60 );
         return String.format("%02d:%02d", mins, secs);
     }
 
@@ -262,12 +262,12 @@ public class LeaderboardScreen implements Screen {
     }
 
     @Override
-    public void resize(int width, int height) {
+    public void resize(int width,  int height) {
         stage.getViewport().update(width, height, true);
     }
 
     @Override
-    public void pause() {
+    public void pause()  {
     }
 
     @Override
@@ -284,14 +284,14 @@ public class LeaderboardScreen implements Screen {
     }
 
 
-    public static class LeaderboardEntry {
+    public static class  LeaderboardEntry {
         public String playerName;
         public int score;
         public String levelId;
         public float completionTime;
         public long timestamp;
 
-        public LeaderboardEntry() {
+        public LeaderboardEntry () {
         }
 
         public LeaderboardEntry(String playerName, int score, String levelId, float completionTime) {
