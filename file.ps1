@@ -12,21 +12,24 @@ if (!(Test-Path .git)) {
 
 # --- The 20-Minute Loop ---
 Write-Host "Starting auto-commit loop... Press Ctrl+C to stop." -ForegroundColor Cyan
-
 while($true) {
-    # Check if there are any changes to commit
     $status = git status --porcelain
     if ($status) {
         $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        Write-Host "[$timestamp] Changes detected. Pushing to GitHub..." -ForegroundColor Yellow
+        Write-Host "[$timestamp] Syncing and pushing to GitHub..." -ForegroundColor Yellow
         
+        # 1. Pull latest changes (rebase keeps history clean)
+        git pull --rebase origin main
+        
+        # 2. Add and commit
         git add .
         git commit -m "Auto-commit: $timestamp"
+        
+        # 3. Push
         git push origin main
     } else {
         Write-Host "[$($timestamp = Get-Date -Format 'HH:mm:ss')] No changes detected. Skipping." -ForegroundColor Gray
     }
 
-    # Wait for 20 minutes (1200 seconds)
     Start-Sleep -Seconds 1200
 }
