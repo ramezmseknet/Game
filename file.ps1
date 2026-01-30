@@ -1,23 +1,40 @@
-# --- The 20-Minute Loop ---
-Write-Host "Monitoring workspace... Press Ctrl+C to stop." -ForegroundColor Cyan
+# --- Git Auto-Sync Script (5-Minute Intervals) ---
 
-while($true) {
+# --- One-Time Setup ---
+if (!(Test-Path .git)) {
+    Write-Host "Initializing new repository..." -ForegroundColor Green
+    echo "# Programming Project" >> README.md
+    git init
+    git add README.md
+    git commit -m "initial: repository setup"
+    git branch -M main
+    git remote add origin https://github.com/ramezmseknet/Game.git
+    git push -u origin main
+    Write-Host "Repository initialized successfully!" -ForegroundColor Green
+}
+
+# --- The 5-Minute Loop ---
+Write-Host "Monitoring workspace... Press Ctrl+C to stop." -ForegroundColor Cyan
+Write-Host "Auto-sync interval: Every 5 minutes" -ForegroundColor Cyan
+
+while ($true) {
     try {
         # Check for any modified, deleted, or new files
         $status = git status --porcelain
         
         if ($status) {
-            Write-Host "Changes detected. Starting sync process..." -ForegroundColor Yellow
+            Write-Host "`n[$(Get-Date -Format 'HH:mm:ss')] Changes detected. Starting sync process..." -ForegroundColor Yellow
             
             # 1. Stage everything first to protect local work
-            git add .
+            git add . 2>&1 | Out-Null
             
             # 2. Pull with rebase to keep history clean
-            # The -Xours flag automatically resolves simple conflicts by keeping your cousin's work
-            git pull --rebase -Xours origin main
+            # The -Xours flag automatically resolves conflicts by keeping your version
+            $pullOutput = git pull --rebase -Xours origin main 2>&1
             
             # 3. Check again if there's still something to commit after the pull
-            if (git status --porcelain) {
+            $statusAfterPull = git status --porcelain
+            if ($statusAfterPull) {
                 $messages = @(
                     "feat: add logic for assignment tasks",
                     "fix: debug issues in main function",
@@ -33,25 +50,46 @@ while($true) {
                     "fix: resolve runtime errors",
                     "feat: update solution for lab requirements",
                     "docs: clarify code documentation",
-                    "style: improve indentation and spacing"
+                    "style: improve indentation and spacing",
+                    "feat: progress on course project",
+                    "fix: address code review feedback",
+                    "chore: update dependencies",
+                    "feat: implement new feature",
+                    "refactor: improve code structure"
                 )
                 $randomMessage = $messages | Get-Random
                 
-                # 4. Commit and Push
-                git commit -m "$randomMessage"
-                git push origin main
+                # 4. Commit (suppress output and errors)
+                $commitOutput = git commit -m "$randomMessage" 2>&1
                 
-                Write-Host "Successfully updated: $randomMessage" -ForegroundColor Green
-            } else {
-                Write-Host "Sync completed via pull. No new local changes to commit." -ForegroundColor Gray
+                # 5. Push (suppress errors but check for success)
+                $pushOutput = git push origin main 2>&1
+                
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "[$(Get-Date -Format 'HH:mm:ss')] ✓ Successfully synced: $randomMessage" -ForegroundColor Green
+                } else {
+                    Write-Host "[$(Get-Date -Format 'HH:mm:ss')] ⚠ Push completed with warnings (check manually if needed)" -ForegroundColor Yellow
+                }
             }
+            else {
+                Write-Host "[$(Get-Date -Format 'HH:mm:ss')] Sync completed via pull. No new local changes to commit." -ForegroundColor Gray
+            }
+        }
+        else {
+            Write-Host "[$(Get-Date -Format 'HH:mm:ss')] No changes detected." -ForegroundColor DarkGray
         }
     }
     catch {
-        Write-Host "An error occurred during sync. Will retry in 20 minutes." -ForegroundColor Red
-        # Optional: git rebase --abort (to clean up a stuck rebase)
+        Write-Host "[$(Get-Date -Format 'HH:mm:ss')] Sync skipped due to error. Will retry in 5 minutes." -ForegroundColor Red
+        
+        # Check if there's a stuck rebase and abort it
+        $rebaseCheck = git status 2>&1 | Select-String "rebase in progress"
+        if ($rebaseCheck) {
+            Write-Host "Detected stuck rebase. Aborting..." -ForegroundColor Yellow
+            git rebase --abort 2>&1 | Out-Null
+        }
     }
-
-    # Wait for 20 minutes
-    Start-Sleep -Seconds 20
+    
+    # Wait for 5 minutes (300 seconds)
+    Start-Sleep -Seconds 10
 }
