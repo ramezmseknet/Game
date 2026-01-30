@@ -31,5 +31,5 @@ while($true) {
         Write-Host "[$($timestamp = Get-Date -Format 'HH:mm:ss')] No changes detected. Skipping." -ForegroundColor Gray
     }
 
-    Start-Sleep -Seconds 1200
+    Start-Sleep -Seconds 20
 }
