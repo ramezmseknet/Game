@@ -1,5 +1,4 @@
 # --- One-Time Setup ---
-# This block ensures the repository is initialized and connected to GitHub
 if (!(Test-Path .git)) {
     Write-Host "Initializing new repository..." -ForegroundColor Green
     echo "# Programming Project" >> README.md
@@ -15,19 +14,18 @@ if (!(Test-Path .git)) {
 Write-Host "Monitoring workspace for changes... Press Ctrl+C to stop." -ForegroundColor Cyan
 
 while($true) {
-    # Check for any modified or new files
     $status = git status --porcelain
     
     if ($status) {
         Write-Host "New changes detected. Updating repository..." -ForegroundColor Yellow
         
-        # 1. Sync with remote first (prevents push conflicts)
-        git pull --rebase origin main
-        
-        # 2. Stage all files
+        # 1. STAGE FIRST (Fixes the 'unstaged changes' error in your screenshot)
         git add .
         
-        # 3. Select a professional, simple message from the list
+        # 2. PULL SECOND (Merges any remote changes into your staged work)
+        git pull --rebase origin main
+        
+        # 3. SELECT MESSAGE
         $messages = @(
             "feat: add logic for assignment tasks",
             "fix: debug issues in main function",
@@ -36,25 +34,23 @@ while($true) {
             "feat: implement basic input handling",
             "style: format code according to course guidelines",
             "fix: correct logic error in loops",
+            "feat: add final touches to lab exercise",
             "chore: prepare project for submission",
             "feat: complete initial implementation of project",
+            "refactor: reorganize project structure",
             "fix: resolve runtime errors",
-            "feat: update solution  requirements",
+            "feat: update solution for lab requirements",
             "docs: clarify code documentation",
             "style: improve indentation and spacing"
         )
         $randomMessage = $messages | Get-Random
         
-        # 4. Commit and Push
+        # 4. COMMIT AND PUSH
         git commit -m "$randomMessage"
         git push origin main
         
         Write-Host "Successfully pushed: $randomMessage" -ForegroundColor Green
-    } else {
-        # Optional: Print a small heart-beat to show the script is still running
-        Write-Host "." -NoNewline
-    }
+    } 
 
-    # Wait for 20 minutes (1200 seconds)
     Start-Sleep -Seconds 10
 }
