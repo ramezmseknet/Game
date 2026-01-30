@@ -23,7 +23,7 @@ while($true) {
         
         # 2. Add and commit
         git add .
-        git commit -m "Auto-commit: $timestamp"
+        git commit -m "	Commit: $timestamp"
         
         # 3. Push
         git push origin main
