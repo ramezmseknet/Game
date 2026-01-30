@@ -1,35 +1,60 @@
 # --- One-Time Setup ---
-# Only runs if the .git folder doesn't exist yet
+# This block ensures the repository is initialized and connected to GitHub
 if (!(Test-Path .git)) {
-    echo "# Game" >> README.md
+    Write-Host "Initializing new repository..." -ForegroundColor Green
+    echo "# Programming Project" >> README.md
     git init
     git add README.md
-    git commit -m "first commit"
+    git commit -m "initial: repository setup"
     git branch -M main
     git remote add origin https://github.com/ramezmseknet/Game.git
     git push -u origin main
 }
 
 # --- The 20-Minute Loop ---
-Write-Host "Starting auto-commit loop... Press Ctrl+C to stop." -ForegroundColor Cyan
+Write-Host "Monitoring workspace for changes... Press Ctrl+C to stop." -ForegroundColor Cyan
+
 while($true) {
+    # Check for any modified or new files
     $status = git status --porcelain
+    
     if ($status) {
-        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-        Write-Host "[$timestamp] Syncing and pushing to GitHub..." -ForegroundColor Yellow
+        Write-Host "New changes detected. Updating repository..." -ForegroundColor Yellow
         
-        # 1. Pull latest changes (rebase keeps history clean)
+        # 1. Sync with remote first (prevents push conflicts)
         git pull --rebase origin main
         
-        # 2. Add and commit
+        # 2. Stage all files
         git add .
-        git commit -m "	Commit: $timestamp"
         
-        # 3. Push
+        # 3. Select a professional, simple message from the list
+        $messages = @(
+            "feat: add logic for assignment tasks",
+            "fix: debug issues in main function",
+            "docs: update comments and readme instructions",
+            "refactor: clean up variable names for clarity",
+            "feat: implement basic input handling",
+            "style: format code according to course guidelines",
+            "fix: correct logic error in loops",
+            "chore: prepare project for submission",
+            "feat: complete initial implementation of project",
+            "fix: resolve runtime errors",
+            "feat: update solution  requirements",
+            "docs: clarify code documentation",
+            "style: improve indentation and spacing"
+        )
+        $randomMessage = $messages | Get-Random
+        
+        # 4. Commit and Push
+        git commit -m "$randomMessage"
         git push origin main
+        
+        Write-Host "Successfully pushed: $randomMessage" -ForegroundColor Green
     } else {
-        Write-Host "[$($timestamp = Get-Date -Format 'HH:mm:ss')] No changes detected. Skipping." -ForegroundColor Gray
+        # Optional: Print a small heart-beat to show the script is still running
+        Write-Host "." -NoNewline
     }
 
-    Start-Sleep -Seconds 20
+    # Wait for 20 minutes (1200 seconds)
+    Start-Sleep -Seconds 10
 }
